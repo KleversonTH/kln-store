@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KLN STORE - Eletrônicos e Gadgets</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --text: #f0f0ff;
+    --muted: #8888aa;
+    --border: rgba(108,99,255,0.2);
+    --card-border: rgba(255,255,255,0.07);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2rem;
+    background: rgba(10,10,15,0.95);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.3rem;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { opacity: 0.85; transform: scale(1.03); }
+
+  /* HERO */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 5rem 2rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.4);
+    color: #a09aff;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.3rem 0.9rem;
+    border-radius: 50px;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 440px;
+    margin-bottom: 2rem;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--card-border);
+    padding: 0.8rem 1.8rem;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: var(--surface); }
+
+  /* HERO VISUAL */
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 340px;
+  }
+
+  .hero-card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    width: 220px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 60px rgba(108,99,255,0.15);
+  }
+
+  .hero-card .product-emoji {
+    font-size: 3.5rem;
+    display: block;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .hero-card .product-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-card .product-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .hero-card .product-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .hero-card .product-price span {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  .floating-tag {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-size: 0.78rem;
+    color: var(--text);
+    z-index: 3;
+  }
+
+  .tag-top { top: 20px; right: 0; }
+  .tag-bottom { bottom: 40px; left: 0; }
+
+  .tag-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .dot-green { background: #4ade80; }
+  .dot-orange { background: #fb923c; }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-item {
+    background: var(--bg);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .stat-item .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-item .label {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  /* PRODUCTS */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+  }
+
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .section-header a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    border-color: rgba(108,99,255,0.4);
+    transform: translateY(-4px);
+  }
+
+  .product-card.featured {
+    border-color: rgba(108,99,255,0.4);
+    position: relative;
+  }
+
+  .featured-label {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 50px;
+    letter-spacing: 0.3px;
+  }
+
+  .card-img {
+    background: var(--surface2);
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .card-body { padding: 1rem; }
+
+  .card-category {
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+
+  .card-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .price-old {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: line-through;
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    margin-bottom: 1px;
+  }
+
+  .btn-cart {
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: #a09aff;
+    border-radius: 8px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-cart:hover { background: rgba(108,99,255,0.3); }
+
+  /* PROMO BANNER */
+  .promo-banner {
+    background: linear-gradient(135deg, #1a1630 0%, #0f1520 100%);
+    border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .promo-banner h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .promo-banner p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .feature-item {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.3rem;
+  }
+
+  .feature-icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
+  .feature-item h4 { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.3rem; }
+  .feature-item p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  footer strong { color: var(--text); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #4ade80;
+    color: #052e0f;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.75rem 1.3rem;
+    border-radius: 10px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">KLN <span>STORE</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Produtos</a></li>
+    <li><a href="#">Promoções</a></li>
+    <li><a href="#">Sobre</a></li>
+    <li><a href="#">Contato</a></li>
+  </ul>
+  <button class="nav-cta">Comprar agora</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="badge">✦ Novidades 2025</div>
+    <h1>Tecnologia que <span class="highlight">transforma</span> seu dia a dia</h1>
+    <p>Gadgets selecionados com qualidade garantida. Os melhores preços do mercado com entrega rápida para todo o Brasil.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.querySelector('.products-grid').scrollIntoView({behavior:'smooth'})">Ver produtos</button>
+      <button class="btn-secondary">Saiba mais</button>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-card">
+      <span class="product-emoji">🎧</span>
+      <div class="product-name">Fone TWS Pro</div>
+      <div class="product-sub">Cancelamento de ruído ativo</div>
+      <div class="product-price">R$79 <span>à vista</span></div>
+    </div>
+    <div class="floating-tag tag-top">
+      <span class="tag-dot dot-green"></span>Em estoque
+    </div>
+    <div class="floating-tag tag-bottom">
+      <span class="tag-dot dot-orange"></span>🔥 42 vendidos hoje
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item">
+    <div class="num">12k+</div>
+    <div class="label">Clientes satisfeitos</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">98%</div>
+    <div class="label">Avaliações positivas</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">48h</div>
+    <div class="label">Entrega expressa</div>
+  </div>
+</div>
+
+<!-- PRODUTOS -->
+<section class="section">
+  <div class="section-header">
+    <h2>Produtos em destaque</h2>
+    <a href="#">Ver todos →</a>
+  </div>
+
+  <div class="products-grid">
+    <!-- Produto 1 -->
+    <div class="product-card featured">
+      <div class="featured-label">Mais vendido</div>
+      <div class="card-img">🎧</div>
+      <div class="card-body">
+        <div class="card-category">Áudio</div>
+        <div class="card-name">Fone Bluetooth TWS Lenovo GM2 Pro</div>
+        <div class="card-desc">Bateria de 6h, graves potentes e conexão estável.</div>
+        <div class="card-footer">
+          <div class="price">
+            <span class="price-old">R$120</span>
+            R$79
+          </div>
+          <button class="btn-cart" onclick="addCart('Lenovo GM2 Pro')">+ Carrinho</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Produto 2 -->
+    <div class="product-card">
+      <div class="card-img">🖱️</div>
+      <div class="card-body">
+        <div class="card-category">Periféricos</div>
+        <div class="card-name">Mouse Gamer HXSJ T90</div>
+        <div class="card-desc">Sensor óptico de alta precisão, design ergonômico.</div>
+        <div class="card-footer">
+          <div class="price">
+            <span class="price-old">R$110</span>
+            R$79
+          </div>
+          <button class="btn-cart" onclick="addCart('Mouse HXSJ T90')">+ Carrinho</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Produto 3 -->
+    <div class="product-card">
+      <div class="card-img">🎮</div>
+      <div class="card-body">
+        <div class="card-category">Games</div>
+        <div class="card-name">Headset Gamer A-607A</div>
+        <div class="card-desc">Som surround, microfone com cancelamento de ruído.</div>
+        <div class="card-footer">
+          <div class="price">
+            <span class="price-old">R$130</span>
+            R$89
+          </div>
+          <button class="btn-cart" onclick="addCart('Headset A-607A')">+ Carrinho</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BANNER PROMO -->
+<div class="promo-banner">
+  <div>
+    <h2>🔥 Frete grátis acima de R$99</h2>
+    <p>Aproveite nossas ofertas e economize ainda mais no frete.</p>
+  </div>
+  <button class="btn-primary">Aproveitar oferta</button>
+</div>
+
+<!-- DIFERENCIAIS -->
+<section class="section">
+  <div class="section-header">
+    <h2>Por que nos escolher?</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-icon">🚚</div>
+      <h4>Entrega rápida</h4>
+      <p>Enviamos em até 24h para todo o Brasil.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🔒</div>
+      <h4>Compra segura</h4>
+      <p>Pagamentos protegidos com criptografia.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">↩️</div>
+      <h4>Troca garantida</h4>
+      <p>7 dias para trocar sem burocracia.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">💬</div>
+      <h4>Suporte humano</h4>
+      <p>Atendimento real via WhatsApp.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <strong>KLN STORE</strong> · Eletrônicos e Gadgets · 2025 · Todos os direitos reservados
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function addCart(name) {
+    var t = document.getElementById('toast');
+    t.textContent = '✓ ' + name + ' adicionado ao carrinho!';
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 2500);
+  }
+</script>
+
+</body>
+</html>
