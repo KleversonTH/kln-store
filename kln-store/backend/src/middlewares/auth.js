@@ -14,6 +14,7 @@ function authMiddleware(req, res, next) {
 }
 
 function adminMiddleware(req, res, next) {
+  console.log('usuario:', req.usuario);
   if (req.usuario?.role !== 'admin') {
     return res.status(403).json({ erro: 'Acesso restrito ao admin' });
   }
