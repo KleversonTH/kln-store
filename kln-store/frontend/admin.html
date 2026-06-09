@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KLN STORE - Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --accent: #6c63ff;
+    --text: #f0f0ff;
+    --muted: #8888aa;
+    --border: rgba(108,99,255,0.2);
+    --card-border: rgba(255,255,255,0.07);
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* LOGIN ADMIN */
+  .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .login-card { background: var(--surface); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 380px; }
+  .login-card h2 { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem; }
+  .login-card p { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+
+  /* DASHBOARD */
+  .dashboard { display: none; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; background: rgba(10,10,15,0.95); border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--text); }
+  .logo span { color: var(--accent); }
+  .badge-admin { background: rgba(108,99,255,0.2); border: 1px solid rgba(108,99,255,0.4); color: #a09aff; font-size: 0.72rem; padding: 2px 10px; border-radius: 50px; margin-left: 8px; }
+
+  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 65px); }
+
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 1rem; }
+  .sidebar-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 1rem; border-radius: 10px; cursor: pointer; color: var(--muted); font-size: 0.9rem; transition: all 0.2s; margin-bottom: 4px; }
+  .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-item.active { background: rgba(108,99,255,0.15); color: #a09aff; }
+
+  .main { padding: 2rem; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.5px; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.3rem; }
+  .stat-card .num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #6c63ff, #ff6584); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .stat-card .label { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+
+  /* TABELA */
+  .table-container { background: var(--surface); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--surface2); padding: 1rem 1.2rem; text-align: left; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  td { padding: 1rem 1.2rem; font-size: 0.88rem; border-top: 1px solid var(--card-border); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .status-badge { padding: 3px 10px; border-radius: 50px; font-size: 0.72rem; font-weight: 500; }
+  .status-pendente { background: rgba(251,146,60,0.15); color: #fb923c; }
+  .status-aprovado { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .status-cancelado { background: rgba(255,100,100,0.15); color: #ff8080; }
+
+  select.status-select { background: var(--surface2); border: 1px solid var(--card-border); color: var(--text); padding: 4px 8px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+
+  /* FORM PRODUTO */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--surface2); border: 1px solid var(--card-border); border-radius: 10px; padding: 0.7rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text); outline: none; transition: border-color 0.2s; }
+  .form-group input:focus, .form-group textarea:focus { border-color: rgba(108,99,255,0.5); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .btn-primary { background: var(--accent); color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-danger { background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.2); color: #ff8080; border-radius: 8px; padding: 0.35rem 0.8rem; font-size: 0.78rem; cursor: pointer; }
+  .btn-danger:hover { background: rgba(255,100,100,0.2); }
+
+  /* FORM */
+  .form-group-login { margin-bottom: 1.2rem; }
+  .form-group-login label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .form-group-login input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 10px; padding: 0.75rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text); outline: none; }
+  .btn-login { width: 100%; background: var(--accent); color: #fff; border: none; padding: 0.85rem; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; }
+
+  .erro { background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.3); color: #ff8080; border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #4ade80; color: #052e0f; font-size: 0.85rem; font-weight: 500; padding: 0.75rem 1.3rem; border-radius: 10px; z-index: 999; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN ADMIN -->
+<div class="login-container" id="login-container">
+  <div class="login-card">
+    <h2>KLN <span style="color:var(--accent)">STORE</span></h2>
+    <p>Painel administrativo</p>
+    <div id="login-erro" class="erro"></div>
+    <div class="form-group-login">
+      <label>Email</label>
+      <input type="email" id="admin-email" placeholder="admin@email.com">
+    </div>
+    <div class="form-group-login">
+      <label>Senha</label>
+      <input type="password" id="admin-senha" placeholder="••••••••">
+    </div>
+    <button class="btn-login" onclick="fazerLoginAdmin()">Entrar</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <nav>
+    <div class="logo">KLN <span>STORE</span> <span class="badge-admin">Admin</span></div>
+    <button style="background:transparent;border:1px solid var(--card-border);color:var(--muted);padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="sair()">Sair</button>
+  </nav>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-item active" onclick="mostrarPagina('dashboard')">📊 Dashboard</div>
+      <div class="sidebar-item" onclick="mostrarPagina('produtos')">📦 Produtos</div>
+      <div class="sidebar-item" onclick="mostrarPagina('pedidos')">🧾 Pedidos</div>
+      <div class="sidebar-item" onclick="mostrarPagina('clientes')">👥 Clientes</div>
+    </div>
+
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="num" id="stat-produtos">-</div><div class="label">Produtos</div></div>
+          <div class="stat-card"><div class="num" id="stat-clientes">-</div><div class="label">Clientes</div></div>
+          <div class="stat-card"><div class="num" id="stat-pedidos">-</div><div class="label">Pedidos</div></div>
+          <div class="stat-card"><div class="num" id="stat-receita">-</div><div class="label">Receita total</div></div>
+        </div>
+      </div>
+
+      <!-- PRODUTOS -->
+      <div class="page" id="page-produtos">
+        <div class="section-header">
+          <div class="page-title" style="margin:0">Produtos</div>
+          <button class="btn-primary" onclick="mostrarFormProduto()">+ Novo produto</button>
+        </div>
+
+        <div id="form-produto" style="display:none;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem">
+          <h3 style="font-family:'Syne',sans-serif;margin-bottom:1.2rem;font-size:1rem">Novo Produto</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" id="p-nome" placeholder="Nome do produto">
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <input type="text" id="p-categoria" placeholder="Ex: Áudio">
+            </div>
+            <div class="form-group">
+              <label>Preço (R$)</label>
+              <input type="number" id="p-preco" placeholder="79.00" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Preço antigo (R$)</label>
+              <input type="number" id="p-preco-antigo" placeholder="120.00" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Estoque</label>
+              <input type="number" id="p-estoque" placeholder="50">
+            </div>
+            <div class="form-group">
+              <label>Emoji</label>
+              <input type="text" id="p-emoji" placeholder="🎧">
+            </div>
+            <div class="form-group full">
+              <label>Descrição</label>
+              <textarea id="p-descricao" placeholder="Descrição do produto"></textarea>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem">
+            <button class="btn-primary" onclick="salvarProduto()">Salvar produto</button>
+            <button style="background:transparent;border:1px solid var(--card-border);color:var(--muted);padding:0.7rem 1.2rem;border-radius:10px;cursor:pointer" onclick="document.getElementById('form-produto').style.display='none'">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-produtos"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PEDIDOS -->
+      <div class="page" id="page-pedidos">
+        <div class="page-title">Pedidos</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Data</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-pedidos"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div class="page" id="page-clientes">
+        <div class="page-title">Clientes</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Cadastro</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-clientes"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let tokenAdmin = localStorage.getItem('admin-token');
+
+  if (tokenAdmin) entrar();
+
+  async function fazerLoginAdmin() {
+    const email = document.getElementById('admin-email').value;
+    const senha = document.getElementById('admin-senha').value;
+    try {
+      const res = await fetch(`${API}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById('login-erro').textContent = data.erro;
+        document.getElementById('login-erro').style.display = 'block';
+        return;
+      }
+      localStorage.setItem('admin-token', data.token);
+      tokenAdmin = data.token;
+      entrar();
+    } catch {
+      document.getElementById('login-erro').textContent = 'Erro ao conectar';
+      document.getElementById('login-erro').style.display = 'block';
+    }
+  }
+
+  function entrar() {
+    document.getElementById('login-container').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    carregarDashboard();
+    carregarProdutos();
+    carregarPedidos();
+    carregarClientes();
+  }
+
+  function sair() {
+    localStorage.removeItem('admin-token');
+    window.location.reload();
+  }
+
+  function mostrarPagina(pagina) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+    document.getElementById(`page-${pagina}`).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  async function carregarDashboard() {
+    try {
+      const [produtos, clientes, pedidos] = await Promise.all([
+        fetch(`${API}/produtos`).then(r => r.json()),
+        fetch(`${API}/admin/clientes`, { headers: { Authorization: `Bearer ${tokenAdmin}` } }).then(r => r.json()),
+        fetch(`${API}/admin/pedidos`, { headers: { Authorization: `Bearer ${tokenAdmin}` } }).then(r => r.json()),
+      ]);
+      document.getElementById('stat-produtos').textContent = produtos.length;
+      document.getElementById('stat-clientes').textContent = clientes.length;
+      document.getElementById('stat-pedidos').textContent = pedidos.length;
+      const receita = pedidos.reduce((acc, p) => acc + parseFloat(p.total), 0);
+      document.getElementById('stat-receita').textContent = `R$${receita.toFixed(2)}`;
+    } catch {}
+  }
+
+  async function carregarProdutos() {
+    const res = await fetch(`${API}/produtos`);
+    const produtos = await res.json();
+    document.getElementById('tabela-produtos').innerHTML = produtos.map(p => `
+      <tr>
+        <td>${p.emoji || '📦'} ${p.nome}</td>
+        <td>${p.categoria || '-'}</td>
+        <td>R$${parseFloat(p.preco).toFixed(2)}</td>
+        <td>${p.estoque}</td>
+        <td><button class="btn-danger" onclick="deletarProduto(${p.id})">Deletar</button></td>
+      </tr>
+    `).join('');
+  }
+
+  async function carregarPedidos() {
+    const res = await fetch(`${API}/admin/pedidos`, { headers: { Authorization: `Bearer ${tokenAdmin}` } });
+    const pedidos = await res.json();
+    document.getElementById('tabela-pedidos').innerHTML = pedidos.map(p => `
+      <tr>
+        <td>#${p.id}</td>
+        <td>${p.cliente}<br><small style="color:var(--muted)">${p.email}</small></td>
+        <td>R$${parseFloat(p.total).toFixed(2)}</td>
+        <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+        <td>
+          <select class="status-select" onchange="atualizarStatus(${p.id}, this.value)">
+            <option ${p.status === 'pendente' ? 'selected' : ''}>pendente</option>
+            <option ${p.status === 'aprovado' ? 'selected' : ''}>aprovado</option>
+            <option ${p.status === 'cancelado' ? 'selected' : ''}>cancelado</option>
+          </select>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function carregarClientes() {
+    const res = await fetch(`${API}/admin/clientes`, { headers: { Authorization: `Bearer ${tokenAdmin}` } });
+    const clientes = await res.json();
+    document.getElementById('tabela-clientes').innerHTML = clientes.map(c => `
+      <tr>
+        <td>${c.nome}</td>
+        <td>${c.email}</td>
+        <td>${new Date(c.criado_em).toLocaleDateString('pt-BR')}</td>
+      </tr>
+    `).join('');
+  }
+
+  function mostrarFormProduto() {
+    document.getElementById('form-produto').style.display = 'block';
+  }
+
+  async function salvarProduto() {
+    const produto = {
+      nome: document.getElementById('p-nome').value,
+      categoria: document.getElementById('p-categoria').value,
+      preco: document.getElementById('p-preco').value,
+      preco_antigo: document.getElementById('p-preco-antigo').value,
+      estoque: document.getElementById('p-estoque').value,
+      emoji: document.getElementById('p-emoji').value,
+      descricao: document.getElementById('p-descricao').value,
+      destaque: false
+    };
+
+    try {
+      const res = await fetch(`${API}/produtos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tokenAdmin}` },
+        body: JSON.stringify(produto)
+      });
+      if (res.ok) {
+        mostrarToast('Produto criado!');
+        document.getElementById('form-produto').style.display = 'none';
+        carregarProdutos();
+        carregarDashboard();
+      }
+    } catch {}
+  }
+
+  async function deletarProduto(id) {
+    if (!confirm('Deletar este produto?')) return;
+    await fetch(`${API}/produtos/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${tokenAdmin}` }
+    });
+    mostrarToast('Produto deletado');
+    carregarProdutos();
+    carregarDashboard();
+  }
+
+  async function atualizarStatus(id, status) {
+    await fetch(`${API}/admin/pedidos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tokenAdmin}` },
+      body: JSON.stringify({ status })
+    });
+    mostrarToast(`Status atualizado: ${status}`);
+  }
+
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+
+</body>
+</html>
