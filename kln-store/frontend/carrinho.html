@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KLN STORE - Carrinho</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --text: #f0f0ff;
+    --muted: #8888aa;
+    --border: rgba(108,99,255,0.2);
+    --card-border: rgba(255,255,255,0.07);
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; background: rgba(10,10,15,0.95); border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 1rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+
+  .container { max-width: 800px; margin: 3rem auto; padding: 0 2rem; }
+
+  h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 2rem; letter-spacing: -0.5px; }
+
+  .vazio { text-align: center; color: var(--muted); padding: 4rem 0; }
+  .vazio p { margin-bottom: 1rem; }
+
+  .item-card { background: var(--surface); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .item-info { display: flex; align-items: center; gap: 1rem; }
+  .item-emoji { font-size: 2rem; }
+  .item-nome { font-size: 0.95rem; font-weight: 500; }
+  .item-preco { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+  .item-subtotal { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+  .btn-remover { background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.2); color: #ff8080; border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; margin-left: 1rem; }
+  .btn-remover:hover { background: rgba(255,100,100,0.2); }
+
+  .resumo { background: var(--surface); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; }
+  .resumo-linha { display: flex; justify-content: space-between; margin-bottom: 0.8rem; color: var(--muted); font-size: 0.9rem; }
+  .resumo-total { display: flex; justify-content: space-between; font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; padding-top: 0.8rem; border-top: 1px solid var(--card-border); margin-top: 0.5rem; }
+
+  .btn-finalizar { width: 100%; background: var(--accent); color: #fff; border: none; padding: 1rem; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: 1.2rem; transition: opacity 0.2s; }
+  .btn-finalizar:hover { opacity: 0.85; }
+
+  .btn-primary { background: var(--accent); color: #fff; border: none; padding: 0.8rem 1.8rem; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #4ade80; color: #052e0f; font-size: 0.85rem; font-weight: 500; padding: 0.75rem 1.3rem; border-radius: 10px; z-index: 999; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">KLN <span>STORE</span></a>
+  <div class="nav-links">
+    <a href="index.html">← Voltar</a>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Meu Carrinho</h1>
+
+  <div id="carrinho-itens"></div>
+
+  <div id="resumo" style="display:none">
+    <div class="resumo">
+      <div class="resumo-linha">
+        <span>Subtotal</span>
+        <span id="subtotal">R$0,00</span>
+      </div>
+      <div class="resumo-linha">
+        <span>Frete</span>
+        <span>Grátis</span>
+      </div>
+      <div class="resumo-total">
+        <span>Total</span>
+        <span id="total">R$0,00</span>
+      </div>
+      <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar pedido</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+
+  if (!token) window.location.href = 'login.html';
+
+  async function carregarCarrinho() {
+    try {
+      const res = await fetch(`${API}/carrinho`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const itens = await res.json();
+      renderizar(itens);
+    } catch {
+      mostrarToast('Erro ao carregar carrinho');
+    }
+  }
+
+  function renderizar(itens) {
+    const container = document.getElementById('carrinho-itens');
+    const resumo = document.getElementById('resumo');
+
+    if (itens.length === 0) {
+      container.innerHTML = `
+        <div class="vazio">
+          <p>Seu carrinho está vazio</p>
+          <a href="index.html" class="btn-primary">Ver produtos</a>
+        </div>`;
+      resumo.style.display = 'none';
+      return;
+    }
+
+    let total = 0;
+    container.innerHTML = itens.map(item => {
+      total += parseFloat(item.subtotal);
+      return `
+        <div class="item-card">
+          <div class="item-info">
+            <span class="item-emoji">${item.emoji || '📦'}</span>
+            <div>
+              <div class="item-nome">${item.nome}</div>
+              <div class="item-preco">R$${parseFloat(item.preco).toFixed(2)} × ${item.quantidade}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center">
+            <span class="item-subtotal">R$${parseFloat(item.subtotal).toFixed(2)}</span>
+            <button class="btn-remover" onclick="remover(${item.id})">Remover</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('subtotal').textContent = `R$${total.toFixed(2)}`;
+    document.getElementById('total').textContent = `R$${total.toFixed(2)}`;
+    resumo.style.display = 'block';
+  }
+
+  async function remover(produto_id) {
+    try {
+      await fetch(`${API}/carrinho/${produto_id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      carregarCarrinho();
+    } catch {
+      mostrarToast('Erro ao remover item');
+    }
+  }
+
+  async function finalizarPedido() {
+    try {
+      const res = await fetch(`${API}/pedidos`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        mostrarToast('🎉 Pedido realizado com sucesso!');
+        setTimeout(() => carregarCarrinho(), 1500);
+      } else {
+        mostrarToast(data.erro || 'Erro ao finalizar pedido');
+      }
+    } catch {
+      mostrarToast('Erro ao conectar com o servidor');
+    }
+  }
+
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  carregarCarrinho();
+</script>
+
+</body>
+</html>

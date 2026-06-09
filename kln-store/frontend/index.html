@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KLN STORE - Eletrônicos e Gadgets</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLN STORE - Eletrônicos e Gadgets</title>
+  <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -477,7 +477,7 @@
     pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
-</style>
+  </style>
 </head>
 <body>
 
@@ -490,7 +490,12 @@
     <li><a href="#">Sobre</a></li>
     <li><a href="#">Contato</a></li>
   </ul>
-  <button class="nav-cta">Comprar agora</button>
+  <div style="display:flex;gap:0.8rem;align-items:center">
+    <a href="carrinho.html" style="color:var(--muted);text-decoration:none;font-size:0.9rem">🛒 Carrinho</a>
+    <button class="nav-cta" onclick="navLogin()">Entrar</button>
+    <span id="nav-usuario" style="color:var(--muted);font-size:0.85rem;display:none"></span>
+    <button id="btn-sair" class="nav-cta" style="display:none;background:transparent;border:1px solid var(--card-border)" onclick="sair()">Sair</button>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -522,7 +527,7 @@
 </section>
 
 <!-- STATS -->
-<div class="stats">
+<section class="stats">
   <div class="stat-item">
     <div class="num">12k+</div>
     <div class="label">Clientes satisfeitos</div>
@@ -535,7 +540,7 @@
     <div class="num">48h</div>
     <div class="label">Entrega expressa</div>
   </div>
-</div>
+</section>
 
 <!-- PRODUTOS -->
 <section class="section">
@@ -600,13 +605,13 @@
 </section>
 
 <!-- BANNER PROMO -->
-<div class="promo-banner">
+<section class="promo-banner">
   <div>
     <h2>🔥 Frete grátis acima de R$99</h2>
     <p>Aproveite nossas ofertas e economize ainda mais no frete.</p>
   </div>
   <button class="btn-primary">Aproveitar oferta</button>
-</div>
+</section>
 
 <!-- DIFERENCIAIS -->
 <section class="section">
@@ -645,12 +650,109 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  function addCart(name) {
-    var t = document.getElementById('toast');
-    t.textContent = '✓ ' + name + ' adicionado ao carrinho!';
-    t.classList.add('show');
-    setTimeout(function () { t.classList.remove('show'); }, 2500);
+  const API = 'http://localhost:3000/api';
+
+// Busca produtos da API
+async function carregarProdutos() {
+  try {
+    const res = await fetch(`${API}/produtos`);
+    const produtos = await res.json();
+
+    const grid = document.querySelector('.products-grid');
+    grid.innerHTML = '';
+
+    produtos.forEach((p, i) => {
+      const featured = p.destaque ? 'featured' : '';
+      const featuredLabel = p.destaque ? '<div class="featured-label">Mais vendido</div>' : '';
+      const precoAntigo = p.preco_antigo ? `<span class="price-old">R$${parseFloat(p.preco_antigo).toFixed(2)}</span>` : '';
+
+      grid.innerHTML += `
+        <div class="product-card ${featured}">
+          ${featuredLabel}
+          <div class="card-img">${p.emoji || '📦'}</div>
+          <div class="card-body">
+            <div class="card-category">${p.categoria || 'Geral'}</div>
+            <div class="card-name">${p.nome}</div>
+            <div class="card-desc">${p.descricao || ''}</div>
+            <div class="card-footer">
+              <div class="price">
+                ${precoAntigo}
+                R$${parseFloat(p.preco).toFixed(2)}
+              </div>
+              <button class="btn-cart" onclick="addCart(${p.id}, '${p.nome}')">+ Carrinho</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error('Erro ao carregar produtos:', err);
   }
+}
+
+// Adiciona ao carrinho
+async function addCart(produto_id, nome) {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/carrinho`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ produto_id, quantidade: 1 })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      mostrarToast(`✓ ${nome} adicionado ao carrinho!`);
+    } else {
+      mostrarToast(data.erro || 'Erro ao adicionar');
+    }
+  } catch (err) {
+    mostrarToast('Erro ao conectar com o servidor');
+  }
+}
+
+function mostrarToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2500);
+}
+
+// Inicia
+carregarProdutos();
+
+// Verifica login na navbar
+function verificarLogin() {
+  const cliente = JSON.parse(localStorage.getItem('cliente') || 'null');
+  if (cliente) {
+    document.getElementById('nav-usuario').textContent = `Olá, ${cliente.nome.split(' ')[0]}`;
+    document.getElementById('nav-usuario').style.display = 'inline';
+    document.getElementById('btn-sair').style.display = 'inline';
+    document.querySelector('.nav-cta').style.display = 'none';
+  }
+}
+
+function navLogin() {
+  window.location.href = 'login.html';
+}
+
+function sair() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('cliente');
+  window.location.reload();
+}
+
+verificarLogin();
 </script>
 
 </body>
