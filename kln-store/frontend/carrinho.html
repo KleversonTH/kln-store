@@ -43,6 +43,8 @@
   .item-subtotal { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
   .btn-remover { background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.2); color: #ff8080; border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; margin-left: 1rem; }
   .btn-remover:hover { background: rgba(255,100,100,0.2); }
+  .btn-qtd { background: var(--surface2); border: 1px solid var(--card-border); color: var(--text); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .btn-qtd:hover { background: rgba(108,99,255,0.2); }
 
   .resumo { background: var(--surface); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; }
   .resumo-linha { display: flex; justify-content: space-between; margin-bottom: 0.8rem; color: var(--muted); font-size: 0.9rem; }
@@ -68,9 +70,7 @@
 
 <div class="container">
   <h1>Meu Carrinho</h1>
-
   <div id="carrinho-itens"></div>
-
   <div id="resumo" style="display:none">
     <div class="resumo">
       <div class="resumo-linha">
@@ -133,12 +133,17 @@
             <span class="item-emoji">${item.emoji || '📦'}</span>
             <div>
               <div class="item-nome">${item.nome}</div>
-              <div class="item-preco">R$${parseFloat(item.preco).toFixed(2)} × ${item.quantidade}</div>
+              <div class="item-preco">R$${parseFloat(item.preco).toFixed(2)} cada</div>
             </div>
           </div>
-          <div style="display:flex;align-items:center">
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <button class="btn-qtd" onclick="alterarQtd(${item.produto_id}, ${item.quantidade - 1})">−</button>
+              <span style="font-size:0.95rem;font-weight:500;min-width:20px;text-align:center">${item.quantidade}</span>
+              <button class="btn-qtd" onclick="alterarQtd(${item.produto_id}, ${item.quantidade + 1})">+</button>
+            </div>
             <span class="item-subtotal">R$${parseFloat(item.subtotal).toFixed(2)}</span>
-            <button class="btn-remover" onclick="remover(${item.id})">Remover</button>
+            <button class="btn-remover" onclick="remover(${item.produto_id})">Remover</button>
           </div>
         </div>`;
     }).join('');
@@ -157,6 +162,22 @@
       carregarCarrinho();
     } catch {
       mostrarToast('Erro ao remover item');
+    }
+  }
+
+  async function alterarQtd(produto_id, novaQtd) {
+    try {
+      await fetch(`${API}/carrinho/${produto_id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ quantidade: novaQtd })
+      });
+      carregarCarrinho();
+    } catch {
+      mostrarToast('Erro ao atualizar quantidade');
     }
   }
 
