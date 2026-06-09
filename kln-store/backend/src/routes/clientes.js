@@ -2,11 +2,32 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 const pool = require('../config/db');
 const { authMiddleware } = require('../middlewares/auth');
 
+// Validações
+const validarCadastro = [
+  body('nome').trim().notEmpty().withMessage('Nome é obrigatório'),
+  body('email').isEmail().withMessage('Email inválido').normalizeEmail(),
+  body('senha').isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres'),
+];
+
+const validarLogin = [
+  body('email').isEmail().withMessage('Email inválido').normalizeEmail(),
+  body('senha').notEmpty().withMessage('Senha é obrigatória'),
+];
+
+function checarErros(req, res, next) {
+  const erros = validationResult(req);
+  if (!erros.isEmpty()) {
+    return res.status(400).json({ erro: erros.array()[0].msg });
+  }
+  next();
+}
+
 // Cadastro
-router.post('/cadastro', async (req, res) => {
+router.post('/cadastro', validarCadastro, checarErros, async (req, res) => {
   const { nome, email, senha } = req.body;
   try {
     const existe = await pool.query('SELECT id FROM clientes WHERE email = $1', [email]);
@@ -24,7 +45,7 @@ router.post('/cadastro', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', validarLogin, checarErros, async (req, res) => {
   const { email, senha } = req.body;
   try {
     const result = await pool.query('SELECT * FROM clientes WHERE email = $1', [email]);
@@ -46,7 +67,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Perfil (autenticado)
+// Perfil
 router.get('/perfil', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, nome, email, criado_em FROM clientes WHERE id = $1', [req.usuario.id]);
