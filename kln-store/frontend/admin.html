@@ -180,6 +180,10 @@
               <input type="text" id="p-emoji" placeholder="🎧">
             </div>
             <div class="form-group full">
+              <label>Link do Mercado Livre</label>
+              <input type="text" id="p-link-ml" placeholder="https://www.mercadolivre.com.br/...">
+            </div>
+            <div class="form-group full">
               <label>Descrição</label>
               <textarea id="p-descricao" placeholder="Descrição do produto"></textarea>
             </div>
@@ -373,6 +377,7 @@
       estoque: document.getElementById('p-estoque').value,
       emoji: document.getElementById('p-emoji').value,
       descricao: document.getElementById('p-descricao').value,
+      link_ml: document.getElementById('p-link-ml').value,
       destaque: false
     };
 

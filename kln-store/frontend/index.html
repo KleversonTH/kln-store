@@ -9,6 +9,20 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  .btn-primary-small {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-primary-small:hover { opacity: 0.85; }
+
   :root {
     --bg: #0a0a0f;
     --surface: #13131a;
@@ -679,7 +693,10 @@ async function carregarProdutos() {
                 ${precoAntigo}
                 R$${parseFloat(p.preco).toFixed(2)}
               </div>
-              <button class="btn-cart" onclick="addCart(${p.id}, '${p.nome}')">+ Carrinho</button>
+              <div style="display:flex;gap:0.5rem">
+                ${p.link_ml ? `<a href="${p.link_ml}" target="_blank" class="btn-primary-small">Comprar</a>` : ''}
+                <button class="btn-cart" onclick="addCart(${p.id}, '${p.nome}')">+ Carrinho</button>
+              </div>
             </div>
           </div>
         </div>

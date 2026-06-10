@@ -41,11 +41,11 @@ router.get('/:id', async (req, res) => {
 
 // Criar (admin)
 router.post('/', authMiddleware, adminMiddleware, validarProduto, checarErros, async (req, res) => {
-  const { nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque } = req.body;
+  const { nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque, link_ml } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO produtos (nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',
-      [nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque || false]
+      'INSERT INTO produtos (nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque, link_ml) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
+      [nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque || false, link_ml]
     );
     res.status(201).json(result.rows[0]);
   } catch {
@@ -55,11 +55,11 @@ router.post('/', authMiddleware, adminMiddleware, validarProduto, checarErros, a
 
 // Editar (admin)
 router.put('/:id', authMiddleware, adminMiddleware, validarProduto, checarErros, async (req, res) => {
-  const { nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque } = req.body;
+  const { nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque, link_ml } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE produtos SET nome=$1, descricao=$2, preco=$3, preco_antigo=$4, estoque=$5, categoria=$6, emoji=$7, destaque=$8 WHERE id=$9 RETURNING *',
-      [nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque || false, req.params.id]
+      'UPDATE produtos SET nome=$1, descricao=$2, preco=$3, preco_antigo=$4, estoque=$5, categoria=$6, emoji=$7, destaque=$8, link_ml=$9 WHERE id=$10 RETURNING *',
+      [nome, descricao, preco, preco_antigo, estoque, categoria, emoji, destaque || false, link_ml, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Produto não encontrado' });
     res.json(result.rows[0]);
