@@ -683,7 +683,7 @@ async function carregarProdutos() {
       grid.innerHTML += `
         <div class="product-card ${featured}">
           ${featuredLabel}
-          <div class="card-img">${p.emoji || '📦'}</div>
+          <div class="card-img">${p.imagem ? `<img src="${p.imagem}" alt="${p.nome}" style="width:100%;height:100%;object-fit:cover;">` : p.emoji || '📦'}</div>
           <div class="card-body">
             <div class="card-category">${p.categoria || 'Geral'}</div>
             <div class="card-name">${p.nome}</div>

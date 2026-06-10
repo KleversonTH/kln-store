@@ -176,8 +176,12 @@
               <input type="number" id="p-estoque" placeholder="50">
             </div>
             <div class="form-group">
-              <label>Emoji</label>
+              <label>Emoji (fallback)</label>
               <input type="text" id="p-emoji" placeholder="🎧">
+            </div>
+            <div class="form-group full">
+              <label>URL da imagem</label>
+              <input type="text" id="p-imagem" placeholder="https://...">
             </div>
             <div class="form-group full">
               <label>Link do Mercado Livre</label>
@@ -378,6 +382,7 @@
       emoji: document.getElementById('p-emoji').value,
       descricao: document.getElementById('p-descricao').value,
       link_ml: document.getElementById('p-link-ml').value,
+      imagem: document.getElementById('p-imagem').value,
       destaque: false
     };
 
